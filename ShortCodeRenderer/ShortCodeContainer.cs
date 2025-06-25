@@ -1,6 +1,9 @@
-﻿using ShortCodeRenderer.Importer;
-using ShortCodeRenderer.Renderer;
-using ShortCodeRenderer.Tasks;
+﻿using ShortCodeRenderer.Common;
+using ShortCodeRenderer.Common.Classes;
+using ShortCodeRenderer.Common.Interfaces;
+using ShortCodeRenderer.Common.Renderer;
+using ShortCodeRenderer.Common.Tasks;
+using ShortCodeRenderer.Importer;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,29 +18,8 @@ namespace ShortCodeRenderer
 {
     public class ShortCodeContainer
     {
-        public readonly static Dictionary<string, Func<string, IShortCodeRender>> TypeDef = new Dictionary<string, Func<string, IShortCodeRender>>()
-        {
-            {"text", (input) => new StringShortCodeRender(input) },
-            {"file", (input) => new FileShortCodeRender(input) },
-        };
-        internal readonly static Dictionary<string, IShortCodeRender> GlobalRenderers = new Dictionary<string, IShortCodeRender>(StringComparer.OrdinalIgnoreCase);
-        public bool Contains(string name, bool searchInGlobalRenders = true) => (searchInGlobalRenders && GlobalRenderers.ContainsKey(name)) || _renderers.ContainsKey(name);
-        public static void AddGlobalRenderer(string name, string value)
-        {
-            GlobalRenderers[name] = new StringShortCodeRender(value);
-        }
-        public static void AddGlobalRenderer(string name, Func<ShortCodeInfo, TaskOr<string>> value)
-        {
-            GlobalRenderers[name] = new FuncShortCodeRender(value);
-        }
-        public static void AddGlobalRenderer(string name, IShortCodeRender renderer)
-        {
-            GlobalRenderers[name] = renderer;
-        }
-        public static void ClearGlobalRenderers()
-        {
-            GlobalRenderers.Clear();
-        }
+
+        public bool Contains(string name, bool searchInGlobalRenders = true) => (searchInGlobalRenders &&  ShortCodeGlobals.GlobalRenderers.ContainsKey(name)) || _renderers.ContainsKey(name);
         internal readonly Dictionary<string, IShortCodeRender> _renderers = new Dictionary<string, IShortCodeRender>(StringComparer.OrdinalIgnoreCase);
         public void AddRenderer(string name, string value)
         {
@@ -61,7 +43,7 @@ namespace ShortCodeRenderer
                 return renderer;
             if (_renderers.TryGetValue(name, out renderer))
                 return renderer;
-            if (GlobalRenderers.TryGetValue(name, out renderer))
+            if (ShortCodeGlobals.GlobalRenderers.TryGetValue(name, out renderer))
                 return renderer;
             return null;
         }
@@ -77,7 +59,7 @@ namespace ShortCodeRenderer
                     cache.Flush();
                 }
             }
-            foreach (var renderer in GlobalRenderers.Values)
+            foreach (var renderer in ShortCodeGlobals.GlobalRenderers.Values)
             {
                 if (renderer is IShortCodeCache cache)
                 {
@@ -106,7 +88,7 @@ namespace ShortCodeRenderer
                 var renderer = (IShortCodeRender)Activator.CreateInstance(type);
                 if (includeGlobal)
                 {
-                    GlobalRenderers[type.Name] = renderer;
+                    ShortCodeGlobals.GlobalRenderers[type.Name] = renderer;
                 }
                 else
                 {
@@ -149,7 +131,7 @@ namespace ShortCodeRenderer
                 return;
             foreach (var shortCode in shortCodes.ShortCodes)
             {
-                var typeDef  = TypeDef.TryGetValue(shortCode.Type, out var func) ? func : null;
+                var typeDef  = ShortCodeGlobals.TypeDef.TryGetValue(shortCode.Type, out var func) ? func : null;
                 if (typeDef == null)
                     continue;
                 _renderers[shortCode.Name] = typeDef(shortCode.Value);

@@ -1,4 +1,6 @@
-﻿using ShortCodeRenderer.Renderer;
+﻿using ShortCodeRenderer.Common;
+using ShortCodeRenderer.Common.Classes;
+using ShortCodeRenderer.Common.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,25 +10,28 @@ using System.Xml.Linq;
 
 namespace ShortCodeRenderer
 {
-    public class ShortCodeContext
+    public class ShortCodeContext : ShortCodeContextBase
     {
+        public static void Initialize()
+        {
+           
+        }
         private static readonly Regex ShortCodePattern = new Regex(@"\[(\w+)([^\]]*)](?:(.*?)(\[/\1]))?", RegexOptions.Compiled | RegexOptions.Singleline);
         private static readonly Regex ShortCodeInnerAttrPattern = new Regex(@"\[(\w+)](.*?)\[/\1]", RegexOptions.Compiled | RegexOptions.Singleline);
         private static readonly Regex ShortCodeAttrPattern = new Regex(@"(\w+)\s*=\s*(?:(['""])(.*?)\2|([^\s]+))", RegexOptions.Compiled | RegexOptions.Singleline);
         private readonly Dictionary<Type, object> _services = new Dictionary<Type, object>();
-        public Dictionary<string, object> Variables { get; internal set; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
         private ShortCodeContext()
         {
 
         }
-        public ShortCodeContext Register<T>(T instance)
+        public override ShortCodeContextBase Register<T>(T instance)
         {
             _services[typeof(T)] = instance;
             return this;
         }
 
 
-        public T GetVariable<T>(string key)
+        public override T GetVariable<T>(string key)
         {
             if (Variables.TryGetValue(key, out var value) && value is T variable)
             {
@@ -34,22 +39,22 @@ namespace ShortCodeRenderer
             }
             return default;
         }
-        public ShortCodeContext SetVariable<T>(string key, T value)
+        public override ShortCodeContextBase SetVariable<T>(string key, T value)
         {
             Variables[key] = value;
             return this;
         }
-        public T Resolve<T>()
+        public override T Resolve<T>()
         {
             if (_services.TryGetValue(typeof(T), out var service))
                 return (T)service;
             return default;
         }
-        public bool IsRegistered<T>()
+        public override bool IsRegistered<T>()
         {
             return _services.ContainsKey(typeof(T));
         }
-        public ShortCodeContext Unregister<T>()
+        public override ShortCodeContextBase Unregister<T>()
         {
             if (_services.ContainsKey(typeof(T)))
             {
@@ -57,7 +62,7 @@ namespace ShortCodeRenderer
             }
             return this;
         }
-        public void Clear()
+        public override void Clear()
         {
             _services.Clear();
         }
@@ -69,7 +74,7 @@ namespace ShortCodeRenderer
                 _container = container
             };
         }
-        public string Render(ShortCodeContext ctx, string code, Dictionary<string, IShortCodeRender> tempRenderers)
+        public override string Render(ShortCodeContextBase ctx, string code, Dictionary<string, IShortCodeRender> tempRenderers)
         {
             ShortCodeTokenizer tokenizer = new ShortCodeTokenizer();
             var results = tokenizer.Tokenize(ref code, true);
@@ -214,14 +219,14 @@ namespace ShortCodeRenderer
             info.IsClosed = match.Groups[4].Success;
             return renderer;
         }
-        public string Render(ShortCodeInfo info) => Render(this, info, null);
-        private string Render(ShortCodeContext ctx, ShortCodeInfo info) => Render(ctx, info, null);
+        public override string Render(ShortCodeInfo info) => Render(this, info, null);
+        private string Render(ShortCodeContextBase ctx, ShortCodeInfo info) => Render(ctx, info, null);
 
-        public string Render(ShortCodeInfo info, Dictionary<string, IShortCodeRender> tempRenderers) => Render(this, info, tempRenderers);
+        public override string Render(ShortCodeInfo info, Dictionary<string, IShortCodeRender> tempRenderers) => Render(this, info, tempRenderers);
 
-        private string Render(ShortCodeContext ctx, ShortCodeInfo info, Dictionary<string, IShortCodeRender> tempRenderers)
+        private string Render(ShortCodeContextBase ctx, ShortCodeInfo info, Dictionary<string, IShortCodeRender> tempRenderers)
         {
-            if (info == null || string.IsNullOrEmpty(info.Name) || ((tempRenderers == null || tempRenderers.Count == 0) && _container._renderers.Count == 0 && ShortCodeContainer.GlobalRenderers.Count == 0))
+            if (info == null || string.IsNullOrEmpty(info.Name) || ((tempRenderers == null || tempRenderers.Count == 0) && _container._renderers.Count == 0 && ShortCodeGlobals.GlobalRenderers.Count == 0))
                 return string.Empty;
             var renderer = _container.GetRenderer(info.Name, tempRenderers);
             if (renderer == null)
@@ -233,13 +238,13 @@ namespace ShortCodeRenderer
             }
             return string.Empty;
         }
-        public string Render(string input) => Render(this, input, null);
+        public override string Render(string input) => Render(this, input, null);
 
-        public string Render(string input, Dictionary<string, IShortCodeRender> tempRenderers) => Render(this, input, tempRenderers);
+        public override string Render(string input, Dictionary<string, IShortCodeRender> tempRenderers) => Render(this, input, tempRenderers);
 
-        private string RenderRegex(ShortCodeContext ctx, string input, Dictionary<string, IShortCodeRender> tempRenderers)
+        private string RenderRegex(ShortCodeContextBase ctx, string input, Dictionary<string, IShortCodeRender> tempRenderers)
         {
-            if (string.IsNullOrEmpty(input) || ((tempRenderers == null || tempRenderers.Count == 0) && _container._renderers.Count == 0 && ShortCodeContainer.GlobalRenderers.Count == 0))
+            if (string.IsNullOrEmpty(input) || ((tempRenderers == null || tempRenderers.Count == 0) && _container._renderers.Count == 0 && ShortCodeGlobals.GlobalRenderers.Count == 0))
                 return input;
             var matches = ShortCodePattern.Matches(input);
             var sb = new StringBuilder();
@@ -265,12 +270,12 @@ namespace ShortCodeRenderer
         }
 
 
-        public Task<string> RenderAsync(ShortCodeInfo info) => RenderAsync(info, null);
-        public Task<string> RenderAsync(ShortCodeInfo info, Dictionary<string, IShortCodeRender> tempRenderers) => RenderAsync(this, info, tempRenderers);
+        public override Task<string> RenderAsync(ShortCodeInfo info) => RenderAsync(info, null);
+        public override Task<string> RenderAsync(ShortCodeInfo info, Dictionary<string, IShortCodeRender> tempRenderers) => RenderAsync(this, info, tempRenderers);
 
-        private async Task<string> RenderAsync(ShortCodeContext ctx, ShortCodeInfo info, Dictionary<string, IShortCodeRender> tempRenderers)
+        private async Task<string> RenderAsync(ShortCodeContextBase ctx, ShortCodeInfo info, Dictionary<string, IShortCodeRender> tempRenderers)
         {
-            if (info == null || string.IsNullOrEmpty(info.Name) || ((tempRenderers == null || tempRenderers.Count == 0) && _container._renderers.Count == 0 && ShortCodeContainer.GlobalRenderers.Count == 0))
+            if (info == null || string.IsNullOrEmpty(info.Name) || ((tempRenderers == null || tempRenderers.Count == 0) && _container._renderers.Count == 0 && ShortCodeGlobals.GlobalRenderers.Count == 0))
                 return string.Empty;
             var renderer = _container.GetRenderer(info.Name, tempRenderers);
             if (renderer == null)
@@ -291,14 +296,14 @@ namespace ShortCodeRenderer
             }
             return string.Empty;
         }
-        public Task<string> RenderAsync(string input) => RenderAsync(this, input, null);
+        public override Task<string> RenderAsync(string input) => RenderAsync(this, input, null);
 
-        private Task<string> RenderAsync(ShortCodeContext ctx, string input) => RenderAsync(input, null);
-        public Task<string> RenderAsync(string input, Dictionary<string, IShortCodeRender> tempRenderers) => RenderAsync(this, input, tempRenderers);
+        public override Task<string> RenderAsync(ShortCodeContextBase ctx, string input) => RenderAsync(input, null);
+        public override Task<string> RenderAsync(string input, Dictionary<string, IShortCodeRender> tempRenderers) => RenderAsync(this, input, tempRenderers);
 
-        private async Task<string> RenderAsync(ShortCodeContext ctx, string input, Dictionary<string, IShortCodeRender> tempRenderers)
+        private async Task<string> RenderAsync(ShortCodeContextBase ctx, string input, Dictionary<string, IShortCodeRender> tempRenderers)
         {
-            if (string.IsNullOrEmpty(input) || ((tempRenderers == null || tempRenderers.Count == 0) && _container._renderers.Count == 0 && ShortCodeContainer.GlobalRenderers.Count == 0))
+            if (string.IsNullOrEmpty(input) || ((tempRenderers == null || tempRenderers.Count == 0) && _container._renderers.Count == 0 && ShortCodeGlobals.GlobalRenderers.Count == 0))
                 return input;
             var matches = ShortCodePattern.Matches(input);
             var sb = new StringBuilder();

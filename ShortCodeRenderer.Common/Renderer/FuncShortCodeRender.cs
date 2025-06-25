@@ -1,9 +1,11 @@
-﻿using ShortCodeRenderer.Tasks;
+﻿using ShortCodeRenderer.Common.Classes;
+using ShortCodeRenderer.Common.Interfaces;
+using ShortCodeRenderer.Common.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ShortCodeRenderer.Renderer
+namespace ShortCodeRenderer.Common.Renderer
 {
     public class FuncShortCodeRender : ShortCodeRenderBase, IShortCodeRender
     {
@@ -18,7 +20,7 @@ namespace ShortCodeRenderer.Renderer
             _value = value;
             Options = options;
         }
-        public override TaskOr<string> Render(ShortCodeContext context, ShortCodeInfo info)
+        public override TaskOr<string> Render(ShortCodeContextBase context, ShortCodeInfo info)
         {
             return _value(info);
         }

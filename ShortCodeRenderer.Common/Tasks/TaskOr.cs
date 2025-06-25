@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace ShortCodeRenderer.Tasks
+namespace ShortCodeRenderer.Common.Tasks
 {
     public class TaskOr<T>
 

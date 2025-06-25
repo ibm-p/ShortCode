@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ShortCodeRenderer
+namespace ShortCodeRenderer.Common.Classes
 {
     public class ShortCodeInfo
     {
@@ -31,5 +31,6 @@ namespace ShortCodeRenderer
                 IsClosed = isClosed;
                 Attributes = attributes;
         }
+        public string GetAttr(string name) => Attributes.GetString(name);
     }
 }

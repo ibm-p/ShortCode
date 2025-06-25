@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ShortCodeRenderer
+namespace ShortCodeRenderer.Common.Classes
 {
     public class ShortCodeOptions
     {

@@ -1,10 +1,12 @@
-﻿using ShortCodeRenderer.Tasks;
+﻿using ShortCodeRenderer.Common.Classes;
+using ShortCodeRenderer.Common.Interfaces;
+using ShortCodeRenderer.Common.Tasks;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace ShortCodeRenderer.Renderer
+namespace ShortCodeRenderer.Common.Renderer
 {
     public class FileShortCodeRender : ShortCodeRenderBase, IShortCodeCache
     {
@@ -31,7 +33,7 @@ namespace ShortCodeRenderer.Renderer
             Options = options;
             _cached = cached;
         }
-        public override TaskOr<string> Render(ShortCodeContext context, ShortCodeInfo info)
+        public override TaskOr<string> Render(ShortCodeContextBase context, ShortCodeInfo info)
         {
             // Eğer cache kullanılıyorsa ve önbellekteki içerik geçerliyse, önbellekten döner.
             if (_cached && _cachedContent != null && _cachedTime.AddMinutes(10) > DateTime.Now)

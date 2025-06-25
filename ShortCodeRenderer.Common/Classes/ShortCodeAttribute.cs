@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ShortCodeRenderer
+namespace ShortCodeRenderer.Common.Classes
 {
     public class ShortCodeAttribute
     {
@@ -20,6 +20,9 @@ namespace ShortCodeRenderer
         public ShortCodeAttributes() : base(StringComparer.OrdinalIgnoreCase)
         {
         }
+
+        public string GetString(string name) =>
+            Get(name)?.Value;
         public ShortCodeAttribute Get(string name) =>
             TryGetValue(name, out var attribute) ? attribute : null;
         public ShortCodeAttribute GetOrAdd(string name)

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortCodeRenderer", "ShortC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortCodeRenderer.Common", "ShortCodeRenderer.Common\ShortCodeRenderer.Common.csproj", "{3BE786BA-75FF-4459-A33A-82203A2D7DC1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortCodeRenderer.Dynamic", "ShortCodeRenderer.Dynamic\ShortCodeRenderer.Dynamic.csproj", "{0835037A-C615-4FE5-AD5A-99D10CCAB89A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{3BE786BA-75FF-4459-A33A-82203A2D7DC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BE786BA-75FF-4459-A33A-82203A2D7DC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BE786BA-75FF-4459-A33A-82203A2D7DC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0835037A-C615-4FE5-AD5A-99D10CCAB89A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0835037A-C615-4FE5-AD5A-99D10CCAB89A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0835037A-C615-4FE5-AD5A-99D10CCAB89A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0835037A-C615-4FE5-AD5A-99D10CCAB89A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
