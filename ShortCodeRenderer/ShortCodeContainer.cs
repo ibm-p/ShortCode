@@ -138,9 +138,9 @@ namespace ShortCodeRenderer
             }
 
         }
-        public void ImportRenderersFromJsonFile(string filePath, bool watch = false)
+        public void ImportRenderersFromJsonFile(string filePath, bool watch = false, Action<Exception> exceptionHandler = null)
         {
-            void _importFromFile()
+            void __importFromFile()
             {
                 lock (_lock)
                 {
@@ -153,6 +153,25 @@ namespace ShortCodeRenderer
                         }
                     }
                 }
+            }
+            void _importFromFile()
+            {
+                if (exceptionHandler == null)
+                    __importFromFile();
+                else
+                {
+                    try
+                    {
+                        __importFromFile();
+                    }
+                    catch (Exception ex)
+                    {
+
+                        exceptionHandler.Invoke(ex);
+                    }
+                }
+
+
             }
             if (watch)
             {

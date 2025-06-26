@@ -55,31 +55,44 @@ namespace ShortCodeRenderer.Renderer
             }
             if (csharpCode == null)
             {
+                List<string> contents = new List<string>();
                 string content = "";
                 if (_isFile)
                 {
                     if (System.IO.File.Exists(_content))
                     {
+                        string dirPath = Path.GetDirectoryName(_content);
+                        if (string.IsNullOrEmpty(dirPath))
+                            dirPath = Directory.GetCurrentDirectory();
+                        string fileName = Path.GetFileName(_content);
+
+
                         bool isDll = _content.EndsWith(".dll", StringComparison.OrdinalIgnoreCase);
-                        if(isDll)
+                        var files = Directory.GetFiles(dirPath, fileName, SearchOption.TopDirectoryOnly);
+                        foreach (var file in files)
                         {
-                            CodeUtils.AddReference(_content);
-                        }
-                        else
-                        {
-                            using (FileStream fs = new FileStream(_content, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                            using (StreamReader reader = new StreamReader(fs))
+                            if (isDll)
                             {
-                                content = reader.ReadToEnd();
+                                CodeUtils.AddReference(file);
+                            }
+                            else
+                            {
+                                using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                                using (StreamReader reader = new StreamReader(fs))
+                                {
+                                    content = reader.ReadToEnd();
+                                    contents.Add(content);
+
+                                }
                             }
                         }
                     }
                 }
                 else
                 {
-                    content = _content;
+                    contents.Add(_content);
                 }
-                csharpCode = CSharpUtils.CompileAndLoad(content);
+                csharpCode = CSharpUtils.CompileAndLoad(contents.ToArray());
                 if (csharpCode == null)
                     return string.Empty;
 

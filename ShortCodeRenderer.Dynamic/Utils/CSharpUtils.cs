@@ -29,9 +29,13 @@ namespace ShortCodeRenderer.Dynamic.Utils
                 .Select(a => MetadataReference.CreateFromFile(a.Location) as MetadataReference)
                 .ToList();
         }
-        public static BaseCommonRender CompileAndLoad(string code)
+        public static BaseCommonRender CompileAndLoad(params string[] codes)
         {
-            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            List<SyntaxTree> trees = new List<SyntaxTree>();
+            foreach (var code in codes)
+            {
+                trees.Add(CSharpSyntaxTree.ParseText(code));
+            }
             var references = new List<MetadataReference>
         {
             MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
@@ -49,10 +53,11 @@ namespace ShortCodeRenderer.Dynamic.Utils
 
             var compilation = CSharpCompilation.Create(
                 "DynamicAsm",
-                new[] { syntaxTree },
+                trees,
                 references: references,
                 options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             );
+
 
             using (var ms = new MemoryStream())
             {
