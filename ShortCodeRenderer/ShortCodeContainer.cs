@@ -197,6 +197,10 @@ namespace ShortCodeRenderer
                     lock (_lock)
                     {
                         RemoveSourceRenderers(filePath);
+                        if(e.FullPath.Equals(filePath, StringComparison.OrdinalIgnoreCase))
+                        {
+                            _importFromFile();
+                        }
                     }
                 };
                 watcher.Deleted += (sender, e) =>
