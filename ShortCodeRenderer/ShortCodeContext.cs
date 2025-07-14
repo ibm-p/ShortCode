@@ -150,10 +150,8 @@ namespace ShortCodeRenderer
                 {
                     sb.Append(token.Content);
                 }
-
             }
             return sb.ToString();
-
         }
         private IShortCodeRender Evulate(ref int lastIndex, StringBuilder sb, Match match, Dictionary<string, IShortCodeRender> tempRenderers, out ShortCodeInfo info)
         {
@@ -303,6 +301,95 @@ namespace ShortCodeRenderer
 
         private async Task<string> RenderAsync(ShortCodeContextBase ctx, string input, Dictionary<string, IShortCodeRender> tempRenderers)
         {
+            ShortCodeTokenizer tokenizer = new ShortCodeTokenizer();
+            var results = tokenizer.Tokenize(ref input, true);
+            //tokenizer.LinkTags(results);
+            StringBuilder sb = new StringBuilder();
+            ShortCodeTokenizeValue linker = null;
+            StringBuilder sbLinked = new StringBuilder();
+            foreach (var token in results)
+            {
+                if (linker != null)
+                {
+                    if (linker.Linked != token)
+                    {
+                        if (!token.InTag)
+                            sbLinked.Append(token.Content);
+                        else
+                            sbLinked.Append(input.Substring(token.Index, token.Length));
+                        continue;
+                    }
+                    //int start = linker.EndIndex + 1;
+                    //int endIndex = token.Index;
+                    //int length = endIndex - start;
+                    //sb.Append(code.Substring(start, length));
+                    var info = new ShortCodeInfo();
+                    info.Name = linker.TagName;
+                    info.Attributes = linker.Attributes;
+                    info.Content = sbLinked.ToString();
+                    var renderer = _container.GetRenderer(token.TagName, null);
+                    if (renderer == null)
+                    {
+                        sb.Append(input.Substring(linker.Index, linker.Length));
+                        sb.Append(sbLinked);
+                        sb.Append(input.Substring(token.Index, token.Length));
+                        continue;
+                    }
+                    info.Name = token.TagName;
+                    info.Attributes = token.Attributes;
+                    var r = renderer.Render(ctx, info);
+                    if (r != null)
+                    {
+                        if (r.IsAsync())
+                        {
+                            string value = await r.AsTask();
+                            if (value != null)
+                                sb.Append(value);
+                        }
+                        else if (r.Value != null)
+                        {
+                            sb.Append(r.Value);
+                        }
+                    }
+                    //if (r != null && !r.IsAsync() && r.Value != null)
+                    //{
+                    //    sb.Append(r.Value);
+                    //}
+                    linker = null;
+                    continue;
+                }
+                if (token.InTag)
+                {
+                    var renderer = token.IsSlashUsed ? null : _container.GetRenderer(token.TagName, null);
+                    if (token.Linked != null && renderer != null)
+                    {
+                        linker = token;
+                        sbLinked.Clear();
+                        continue;
+                    }
+                    if (renderer == null)
+                    {
+                        sb.Append(input.Substring(token.Index, token.Length));
+                        continue;
+                    }
+                    if (token.IsSlashUsed && !token.Unclosed)
+                        continue;
+                    var info = new ShortCodeInfo();
+                    info.Name = token.TagName;
+                    info.Attributes = token.Attributes;
+                    var r = renderer.Render(ctx, info);
+                    if (r != null && !r.IsAsync() && r.Value != null)
+                    {
+                        sb.Append(r.Value);
+                    }
+                }
+                else
+                {
+                    sb.Append(token.Content);
+                }
+            }
+            return sb.ToString();
+            /*
             if (string.IsNullOrEmpty(input) || ((tempRenderers == null || tempRenderers.Count == 0) && _container._renderers.Count == 0 && ShortCodeGlobals.GlobalRenderers.Count == 0))
                 return input;
             var matches = ShortCodePattern.Matches(input);
@@ -334,7 +421,7 @@ namespace ShortCodeRenderer
             {
                 sb.Append(input.Substring(lastIndex));
             }
-            return sb.ToString();
+            return sb.ToString();*/
         }
     }
 }

@@ -106,6 +106,13 @@ namespace ShortCodeRenderer
         private readonly object _lock = new object();
         public void RemoveSourceRenderers(string name)
         {
+            lock (_lock)
+            {
+                RemoveSourceRenderersInternal(name);
+            }
+        }
+        private void RemoveSourceRenderersInternal(string name)
+        {
             List<string> toRemove = new List<string>();
             foreach (var item in _renderers)
             {
@@ -184,7 +191,7 @@ namespace ShortCodeRenderer
                 {
                     lock (_lock)
                     {
-                        RemoveSourceRenderers(filePath);
+                        RemoveSourceRenderersInternal(filePath);
                         _importFromFile();
                     }
                 };
@@ -196,7 +203,7 @@ namespace ShortCodeRenderer
                 {
                     lock (_lock)
                     {
-                        RemoveSourceRenderers(filePath);
+                        RemoveSourceRenderersInternal(filePath);
                         if(e.FullPath.Equals(filePath, StringComparison.OrdinalIgnoreCase))
                         {
                             _importFromFile();
@@ -207,7 +214,7 @@ namespace ShortCodeRenderer
                 {
                     lock (_lock)
                     {
-                        RemoveSourceRenderers(filePath);
+                        RemoveSourceRenderersInternal(filePath);
                     }
                 };
                 watcher.NotifyFilter = NotifyFilters.Attributes

@@ -32,5 +32,21 @@ namespace ShortCodeRenderer.Common.Classes
                 Attributes = attributes;
         }
         public string GetAttr(string name) => Attributes.GetString(name);
+        public static ShortCodeInfo From(string name)
+        {
+            return new ShortCodeInfo(name);
+        }
+        public static ShortCodeInfo From(string name, string content)
+        {
+            return new ShortCodeInfo(name, content);
+        }
+        public static ShortCodeInfo From(string name, string content, ShortCodeAttributes attributes)
+        {
+            return new ShortCodeInfo(name, content, attributes);
+        }
+        public static ShortCodeInfo From(string name, ShortCodeAttributes attributes)
+        {
+            return new ShortCodeInfo(name, null, attributes);
+        }
     }
 }
