@@ -7,7 +7,7 @@ namespace ShortCodeRenderer.Common.Classes
     public class ShortCodeAttribute
     {
         public string Name { get; set; }
-        public string Value { get; set; }
+        public object Value { get; set; }
         public bool IsInnerAttribute { get; set; }
     }
     public class ShortCodeAttributes : Dictionary<string, ShortCodeAttribute>
@@ -22,6 +22,9 @@ namespace ShortCodeRenderer.Common.Classes
         }
 
         public string GetString(string name) =>
+            Get(name)?.Value as string;
+
+        public object GetObject(string name) =>
             Get(name)?.Value;
         public ShortCodeAttribute Get(string name) =>
             TryGetValue(name, out var attribute) ? attribute : null;

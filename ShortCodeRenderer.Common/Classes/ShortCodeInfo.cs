@@ -31,7 +31,8 @@ namespace ShortCodeRenderer.Common.Classes
                 IsClosed = isClosed;
                 Attributes = attributes;
         }
-        public string GetAttr(string name) => Attributes.GetString(name);
+        public string GetAttrStr(string name) => Attributes.GetString(name);
+        public object GetAttr(string name) => Attributes.GetObject(name);
         public static ShortCodeInfo From(string name)
         {
             return new ShortCodeInfo(name);
