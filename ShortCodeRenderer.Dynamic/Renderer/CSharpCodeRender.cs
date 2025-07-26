@@ -18,7 +18,6 @@ namespace ShortCodeRenderer.Renderer
         private bool _isFile = false;
         BaseCommonRender csharpCode = null;
         public static string DefaultPath = "";
-
         public CSharpCodeRender(string content) : this(content, null)
         {
         }

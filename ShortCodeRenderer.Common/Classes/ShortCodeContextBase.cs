@@ -1,6 +1,7 @@
 ﻿using ShortCodeRenderer.Common.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -9,10 +10,10 @@ namespace ShortCodeRenderer.Common.Classes
 {
     public abstract class ShortCodeContextBase
     {
+        public TextWriter Writer { get; internal set; }
         public Dictionary<string, object> Variables { get; internal set; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
         public abstract ShortCodeContextBase Register<T>(T instance);
-
-
+        public void SetWriter(TextWriter writer) => Writer = writer;
         public abstract T GetVariable<T>(string key);
         public abstract ShortCodeContextBase SetVariable<T>(string key, T value);
         public abstract T Resolve<T>();
