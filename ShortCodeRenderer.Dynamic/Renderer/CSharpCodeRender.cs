@@ -64,8 +64,6 @@ namespace ShortCodeRenderer.Renderer
                         if (string.IsNullOrEmpty(dirPath))
                             dirPath = Directory.GetCurrentDirectory();
                         string fileName = Path.GetFileName(_content);
-
-
                         bool isDll = _content.EndsWith(".dll", StringComparison.OrdinalIgnoreCase);
                         var files = Directory.GetFiles(dirPath, fileName, SearchOption.TopDirectoryOnly);
                         foreach (var file in files)
