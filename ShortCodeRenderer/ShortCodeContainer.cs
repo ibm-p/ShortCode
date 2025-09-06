@@ -7,6 +7,7 @@ using ShortCodeRenderer.Importer;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text.Json;
@@ -21,6 +22,15 @@ namespace ShortCodeRenderer
 
         public bool Contains(string name, bool searchInGlobalRenders = true) => (searchInGlobalRenders &&  ShortCodeGlobals.GlobalRenderers.ContainsKey(name)) || _renderers.ContainsKey(name);
         internal readonly Dictionary<string, IShortCodeRender> _renderers = new Dictionary<string, IShortCodeRender>(StringComparer.OrdinalIgnoreCase);
+
+        public Dictionary<string, IShortCodeRender> GetRenderers()
+        {
+            return _renderers;
+        }
+        public Dictionary<string, IShortCodeRender> GetGlobalRenderers()
+        {
+            return ShortCodeGlobals.GlobalRenderers;
+        }
         public void AddRenderer(string name, string value)
         {
             _renderers[name] = new StringShortCodeRender(value);
