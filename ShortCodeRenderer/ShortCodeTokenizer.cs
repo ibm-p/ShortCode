@@ -145,7 +145,8 @@ namespace ShortCodeRenderer
         {
             char open = '[';
             char close = ']';
-
+            if (input == null)
+                return new List<ShortCodeTokenizeValue>();
             int tLen = input.Length;
             StringBuilder content = new StringBuilder();
             StringBuilder tagContent = new StringBuilder();
