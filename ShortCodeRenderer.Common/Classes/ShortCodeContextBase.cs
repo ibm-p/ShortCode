@@ -11,6 +11,29 @@ namespace ShortCodeRenderer.Common.Classes
     public abstract class ShortCodeContextBase
     {
         public TextWriter Writer { get; internal set; }
+        public object Model { get; internal set; }
+        public object ModelContext { get; internal set; }
+        public T GetModel<T>()
+        {
+            if (Model is T)
+                return (T)Model;
+            return default;
+        }
+        public void SetModel<T>(T model)
+        {
+            Model = model;
+        }
+
+        public T GetModelContext<T>()
+        {
+            if (ModelContext is T)
+                return (T)ModelContext;
+            return default;
+        }
+        public void SetModelContext<T>(T modelContext)
+        {
+            ModelContext = modelContext;
+        }
         public Dictionary<string, object> Variables { get; internal set; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
         public abstract ShortCodeContextBase Register<T>(T instance);
         public void SetWriter(TextWriter writer) => Writer = writer;

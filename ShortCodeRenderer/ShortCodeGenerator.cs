@@ -37,6 +37,16 @@ namespace ShortCodeRenderer
             _ctx.SetVariable(key, value);
             return this;
         }
+        public ShortCodeBuilder SetModel<T>(T model)
+        {
+            _ctx.SetModel(model);
+            return this;
+        }
+        public ShortCodeBuilder SetModelContext<T>(T modelContext)
+        {
+            _ctx.SetModelContext(modelContext);
+            return this;
+        }
         public string Render()
         {
             return _ctx.Render(_info);
